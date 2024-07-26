@@ -86,10 +86,7 @@ print("Listeners started.")
 print("Press ESC to exit.")
 def on_press_for_exit(key):
     if key == keyboard.Key.esc:
-        mouse_listener.stop()
-        keyboard_listener.stop()
-        cap.release()  # Release the webcam
-        return False
+        print("Just Kidding you cant escape this...")
 
 exit_listener = keyboard.Listener(on_press=on_press_for_exit)
 exit_listener.start()
