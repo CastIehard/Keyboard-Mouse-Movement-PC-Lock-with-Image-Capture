@@ -5,6 +5,7 @@ import os
 import threading
 from datetime import datetime
 import pygetwindow as gw
+import ctypes
 
 # Flag to ensure the lock is triggered only once
 lock_triggered = threading.Event()
@@ -22,17 +23,23 @@ def minimize_current_window():
     if window is not None:
         window.minimize()
 
+def hide_console():
+    """Hide the console window."""
+    console = ctypes.windll.kernel32.GetConsoleWindow()
+    if console != 0:
+        ctypes.windll.user32.ShowWindow(console, 0)
+
 def lock_pc():
     """Lock the PC based on the operating system."""
     try:
         subprocess.run(["rundll32.exe", "user32.dll,LockWorkStation"], check=True)
-    except Exception as e:
+    except Exception:
         try:
             subprocess.run(["loginctl", "lock-session"], check=True)
-        except Exception as e:
+        except Exception:
             try:
                 subprocess.run(["/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession", "-suspend"], check=True)
-            except Exception as e:
+            except Exception:
                 try:
                     subprocess.run(["gnome-screensaver-command", "-l"], check=True)
                 except Exception as e:
@@ -77,6 +84,7 @@ def on_press(key):
     threading.Thread(target=capture_image, args=('key_press',)).start()
 
 minimize_current_window()
+hide_console()
 
 mouse_listener = mouse.Listener(on_move=on_move, on_click=on_click)
 keyboard_listener = keyboard.Listener(on_press=on_press)
@@ -94,4 +102,11 @@ exit_listener = keyboard.Listener(on_press=on_press_for_exit)
 exit_listener.start()
 exit_listener.join()
 
+# Prevent the script from being visible in the taskbar
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(None)
+
 input("Press Enter to exit...")
+
+# Ensure proper cleanup on exit
+cap.release()
+cv2.destroyAllWindows()
