@@ -48,7 +48,9 @@ def capture_image(event_type):
             print("Failed to capture image - end of stream reached.")
             return
         
-        directory = os.path.join(os.getcwd(), 'captures')
+        directory = "c:\\Users\\DEBURLUC\\Desktop\\Captures"
+        print(f"Capturing image for {event_type} event...")
+        print(f"Saving image to {directory}...")
         if not os.path.exists(directory):
             os.makedirs(directory)
 
@@ -91,3 +93,5 @@ def on_press_for_exit(key):
 exit_listener = keyboard.Listener(on_press=on_press_for_exit)
 exit_listener.start()
 exit_listener.join()
+
+input("Press Enter to exit...")
